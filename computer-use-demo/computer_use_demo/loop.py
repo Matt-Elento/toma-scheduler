@@ -29,6 +29,8 @@ from anthropic.types.beta import (
     BetaToolUseBlockParam,
 )
 
+from computer_use_demo.tools.submit_appointment_info import SubmitAppointmentInfoTool
+
 from .tools import BashTool, ComputerTool, EditTool, ToolCollection, ToolResult
 
 COMPUTER_USE_BETA_FLAG = "computer-use-2024-10-22"
@@ -92,6 +94,7 @@ async def sampling_loop(
         ComputerTool(),
         BashTool(),
         EditTool(),
+        SubmitAppointmentInfoTool(),
     )
     system = BetaTextBlockParam(
         type="text",

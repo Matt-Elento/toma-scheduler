@@ -44,9 +44,13 @@ STREAMLIT_STYLE = """
     }
 </style>
 """
+PROMPT = """
+Help me schedule an appointment. Navigate to the schedulerUrl and complete any necessary forms to schedule my appointment. Don't use any live chats or phone calls. Close any unnecessary popups. Don't try to sign up or sign in. 
 
-WARNING_TEXT = "⚠️ Security Alert: Never provide access to sensitive accounts or data, as malicious web content can hijack Claude's behavior"
+Once you have successfully scheduled the appointment, submit the appointment info.
 
+My information: 
+"""
 
 class Sender(StrEnum):
     USER = "user"
@@ -96,10 +100,7 @@ async def main():
 
     st.markdown(STREAMLIT_STYLE, unsafe_allow_html=True)
 
-    st.title("Claude Computer Use Demo")
-
-    if not os.getenv("HIDE_WARNING", False):
-        st.warning(WARNING_TEXT)
+    st.title("Toma Scheduler Demo")
 
     with st.sidebar:
 
@@ -134,14 +135,7 @@ async def main():
             key="only_n_most_recent_images",
             help="To decrease the total tokens sent, remove older screenshots from the conversation",
         )
-        st.text_area(
-            "Custom System Prompt Suffix",
-            key="custom_system_prompt",
-            help="Additional instructions to append to the system prompt. see computer_use_demo/loop.py for the base system prompt.",
-            on_change=lambda: save_to_storage(
-                "system_prompt", st.session_state.custom_system_prompt
-            ),
-        )
+        
         st.checkbox("Hide screenshots", key="hide_images")
 
         if st.button("Reset", type="primary"):
@@ -164,7 +158,7 @@ async def main():
 
     chat, http_logs = st.tabs(["Chat", "HTTP Exchange Logs"])
     new_message = st.chat_input(
-        "Type a message to send to Claude to control the computer..."
+        "Enter customer data"
     )
 
     with chat:
@@ -195,7 +189,7 @@ async def main():
             st.session_state.messages.append(
                 {
                     "role": Sender.USER,
-                    "content": [BetaTextBlockParam(type="text", text=new_message)],
+                    "content": [BetaTextBlockParam(type="text", text=PROMPT+new_message)],
                 }
             )
             _render_message(Sender.USER, new_message)
